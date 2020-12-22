@@ -130,7 +130,7 @@
         for (var i = 1; i < keyword_count + 1; i++) {
           const keyword = document.getElementById('keyword_' + i).value
           if (keyword) {
-            keyword_list.push(keyword)
+            keyword_list.push('"' + keyword + '"')
           }
         }
         for (var i = 1; i < user_count + 1; i++) {
