@@ -47,7 +47,7 @@
         ><input
           type="radio"
           name="mode"
-          value=""
+          value="AND"
           checked
         />AND検索(キーワード全てが含まれる検索)</label
       >
@@ -145,7 +145,7 @@
         }
 
         const mode = getRadioValue('mode')
-        const keyword_text = keyword_list.join(mode + ' ')
+        const keyword_text = keyword_list.join(mode == 'AND' ? ' ' : ' OR ')
         const user_text = user_list.length ? ' ' + user_list.join(' ') : ''
         const search_text =
           keyword_text + user_text + ' OR @_' + randomText(13) + '_'
