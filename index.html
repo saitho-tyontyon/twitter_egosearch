@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ツイッターエゴサテキスト生成機</title>
+    <style>
+      label {
+        display: block;
+      }
+      body {
+        padding-bottom: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      ツイッターエゴサテキスト生成機 by<a
+        href="twitter.com/sa_i_tho_"
+        target="_blank"
+        >@sa_i_tho_</a
+      >
+    </h1>
+    <p>
+      キーワードが細切れになってしまう、
+      名前にキーワードが入っている人のツイートが出てくる、
+      自分のツイートやbotのツイートが出てくる等、
+      エゴサ時のお悩みを解決するツールです。
+    </p>
+    <ul>
+      <li>
+        検索したいキーワードと、任意で検索から除外したいユーザー(自分やbot)のIDを入力してください。
+      </li>
+      <li>AND検索は「FGO」「エレナ」のように、より対象を絞り込む検索です。</li>
+      <li>
+        OR検索は「エレナ」「ブラヴァツキー」「エレナママ」のように、表記ゆれに対応させる検索です。
+      </li>
+      <li>未記入の項目は無視します。</li>
+      <li>
+        長くなりすぎると検索できなくなるので、キーワード数・ユーザー数は増やしすぎないようにしましょう。
+      </li>
+    </ul>
+    <div style="margin-bottom: 50px">
+      <h2>検索用テキスト作成</h2>
+      <h3>検索モード</h3>
+      <label
+        ><input
+          type="radio"
+          name="mode"
+          value=""
+          checked
+        />AND検索(キーワード全てが含まれる検索)</label
+      >
+      <label
+        ><input
+          type="radio"
+          name="mode"
+          value="OR"
+        />OR検索(キーワードのうちどれかが含まれる検索)</label
+      >
+      <h3>
+        検索したいキーワード【必須】
+        <button onclick="addKeyword()">キーワードを追加する</button>
+      </h3>
+      <label>キーワード1<input id="keyword_1" type="text"/></label>
+      <h3>
+        検索から除外したいユーザーのID
+        <button onclick="addUser()">ユーザーを追加する</button>
+      </h3>
+      <label>ユーザー1<input id="user_1" type="text"/></label>
+    </div>
+    <div style="margin-bottom: 50px">
+      <button onclick="createSearchText()" style="font-size: 1.5em">
+        検索テキスト生成&コピー</button
+      ><br />
+    </div>
+
+    <div style="margin-bottom: 50px">
+      <h2>出力</h2>
+      <a id="testSearch" href="#" target="_blank">試しに検索する</a
+      >(テキスト生成後リンクが繋がります)<br />
+      <textarea id="copyTarget" style="width: 100%"></textarea>
+    </div>
+
+    <script>
+      var observer = new MutationObserver(function() {
+        copyText()
+      })
+      const config = {
+        attributes: true,
+        childList: true,
+        characterData: true
+      }
+      const elem = document.getElementById('copyTarget')
+      observer.observe(elem, config)
+
+      let keyword_count = 1
+      let user_count = 1
+
+      function addKeyword() {
+        const last_elm = document.getElementById('keyword_' + keyword_count)
+          .parentNode
+        keyword_count++
+        last_elm.insertAdjacentHTML(
+          'afterend',
+          '<label>キーワード' +
+            keyword_count +
+            '<input id="keyword_' +
+            keyword_count +
+            '" type="text" /></label>'
+        )
+      }
+      function addUser() {
+        const last_elm = document.getElementById('user_' + user_count)
+          .parentNode
+        user_count++
+        last_elm.insertAdjacentHTML(
+          'afterend',
+          '<label>ユーザー' +
+            user_count +
+            '<input id="user_' +
+            user_count +
+            '" type="text" /></label>'
+        )
+      }
+
+      function createSearchText() {
+        const keyword_list = []
+        const user_list = []
+        for (var i = 1; i < keyword_count + 1; i++) {
+          const keyword = document.getElementById('keyword_' + i).value
+          if (keyword) {
+            keyword_list.push(keyword)
+          }
+        }
+        for (var i = 1; i < user_count + 1; i++) {
+          const user = document.getElementById('user_' + i).value
+          if (user) {
+            user_list.push('-from:' + user)
+          }
+        }
+        if (!keyword_list.length) {
+          alert('キーワードを最低一つは設定してください')
+          return
+        }
+
+        const mode = getRadioValue('mode')
+        const keyword_text = keyword_list.join(mode + ' ')
+        const user_text = user_list.length ? ' ' + user_list.join(' ') : ''
+        const search_text =
+          keyword_text + user_text + ' OR @_' + randomText(13) + '_'
+
+        const textarea_elm = document.getElementById('copyTarget')
+        const link_elm = document.getElementById('testSearch')
+        textarea_elm.textContent = search_text
+
+        link_elm.setAttribute(
+          'href',
+          'twitter.com/search?q=' + encodeURI(search_text)
+        )
+      }
+
+      function copyText() {
+        document.getElementById('copyTarget').select()
+        document.execCommand('copy')
+        if (
+          window.confirm(
+            'コピーが完了しました。ついでにこの生成機を宣伝しますか？（エゴサ内容は投稿されません。）'
+          )
+        ) {
+          share()
+        }
+      }
+
+      function share() {
+        window.open(
+          'twitter.com/intent/tweet?' +
+            [
+              'text=' +
+                encodeURIComponent(
+                  '『ツイッターエゴサテキスト生成機』は\n・キーワードが細切れになってしまう\n・名前にキーワードが入っている人のツイートが出てくる\n・自分のツイートやbotのツイートが出てくる\n\nそんな悩みを解決します！'
+                ),
+              'url=' + encodeURIComponent(location.href)
+            ].join('&')
+        )
+      }
+
+      function randomText(l) {
+        var c = 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+        var cl = c.length
+        var r = ''
+        for (var i = 0; i < l; i++) {
+          r += c[Math.floor(Math.random() * cl)]
+        }
+        return r
+      }
+
+      function getRadioValue(elm_name) {
+        var elements = document.getElementsByName(elm_name)
+        for (var a = '', i = elements.length; i--; ) {
+          if (elements[i].checked) {
+            var a = elements[i].value
+            break
+          }
+        }
+        return a
+      }
+    </script>
+  </body>
+</html>
