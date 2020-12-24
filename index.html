@@ -21,6 +21,7 @@
         >@sa_i_tho_</a
       >
     </h1>
+    <button onclick="share()">シェアする</button>
     <p>
       キーワードが細切れになってしまう、
       名前にキーワードが入っている人のツイートが出てくる、
@@ -80,6 +81,7 @@
       <a id="testSearch" href="#" target="_blank">試しに検索する</a
       >(テキスト生成後リンクが繋がります)<br />
       <textarea id="copyTarget" style="width: 100%"></textarea>
+      <button onclick="share()">シェアする</button>
     </div>
 
     <script>
@@ -163,23 +165,16 @@
       function copyText() {
         document.getElementById('copyTarget').select()
         document.execCommand('copy')
-        if (
-          window.confirm(
-            'コピーが完了しました。ついでにこの生成機を宣伝しますか？（エゴサ内容は投稿されません。）'
-          )
-        ) {
-          share()
-        }
+        alert(
+          'コピーが完了しました。よろしければこのサイトをシェアしていただけると嬉しいです！'
+        )
       }
 
       function share() {
         window.open(
           'https://twitter.com/intent/tweet?' +
             [
-              'text=' +
-                encodeURIComponent(
-                  '『ツイッターエゴサテキスト生成機』は\n・キーワードが細切れになってしまう\n・名前にキーワードが入っている人のツイートが出てくる\n・自分のツイートやbotのツイートが出てくる\n\nそんな悩みを解決します！'
-                ),
+              'text=' + encodeURIComponent('ツイッターエゴサテキスト生成機'),
               'url=' + encodeURIComponent(location.href)
             ].join('&')
         )
